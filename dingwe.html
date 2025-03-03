@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blow the Birthday Candle</title>
+    <style>
+        body {
+            background-color: #e6f2ff; /* Light blue background */
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            text-align: center;
+            margin-top: -50px;
+        }
+
+        .birthday-message {
+            font-size: 36px;
+            color: #1e88e5; /* Medium blue */
+            margin-top: 40px;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .controls {
+            margin-top: 320px;
+            z-index: 100;
+            position: relative;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 30px;
+            background-color: #1e88e5; /* Medium blue */
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+            margin-top: 60px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #0d47a1; /* Darker blue */
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .instructions {
+            color: #0d47a1; /* Darker blue */
+            max-width: 400px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0;
+        }
+
+        #mic-status {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #0d47a1; /* Darker blue */
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 8px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Cake Styles - Updated for chocolate theme */
+        .cake {
+            position: absolute;
+            width: 250px;
+            height: 200px;
+            top: 50%;
+            left: 50%;
+            margin-top: -100px;
+            margin-left: -125px;
+        }
+
+        .plate {
+            width: 270px;
+            height: 110px;
+            position: absolute;
+            bottom: -10px;
+            left: -10px;
+            background-color: #e0e0e0; /* Light gray plate */
+            border-radius: 50%;
+            box-shadow: 0 2px 0 #b3b3b3, 0 4px 0 #b3b3b3, 0 5px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .cake > * {
+            position: absolute;
+        }
+
+        .layer {
+            position: absolute;
+            display: block;
+            width: 250px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #4e342e; /* Dark brown for chocolate cake */
+            box-shadow: 0 2px 0px #3e2723, 0 4px 0px #3e2723, 0 6px 0px #3e2723, 0 8px 0px #3e2723, 0 10px 0px #3e2723, 0 12px 0px #3e2723, 0 14px 0px #3e2723, 0 16px 0px #3e2723, 0 18px 0px #3e2723, 0 20px 0px #3e2723, 0 22px 0px #3e2723, 0 24px 0px #3e2723, 0 26px 0px #3e2723, 0 28px 0px #3e2723, 0 30px 0px #3e2723;
+        }
+
+        .layer-top {
+            top: 0px;
+        }
+
+        .layer-middle {
+            top: 33px;
+        }
+
+        .layer-bottom {
+            top: 66px;
+        }
+
+        .icing {
+            top: 2px;
+            left: 5px;
+            background-color: #6d4c41; /* Medium brown for chocolate icing */
+            width: 240px;
+            height: 90px;
+            border-radius: 50%;
+        }
+
+        .icing:before {
+            content: "";
+            position: absolute;
+            top: 4px;
+            right: 5px;
+            bottom: 6px;
+            left: 5px;
+            background-color: #795548; /* Lighter brown highlight */
+            box-shadow: 0 0 4px #8d6e63, 0 0 4px #8d6e63, 0 0 4px #8d6e63;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .drip {
+            display: block;
+            width: 50px;
+            height: 60px;
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+            background-color: #6d4c41; /* Matching chocolate icing */
+        }
+
+        .drip1 {
+            top: 53px;
+            left: 5px;
+            transform: skewY(15deg);
+            height: 48px;
+            width: 40px;
+        }
+
+        .drip2 {
+            top: 69px;
+            left: 181px;
+            transform: skewY(-15deg);
+        }
+
+        .drip3 {
+            top: 54px;
+            left: 90px;
+            width: 80px;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+        }
+
+        .candle {
+            background-color: #64b5f6; /* Light blue candle */
+            width: 12px;
+            height: 35px;
+            border-radius: 6px/3px;
+            top: -20px;
+            left: 50%;
+            margin-left: -8px;
+            z-index: 10;
+        }
+
+        .candle:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 12px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #1e88e5; /* Medium blue candle top */
+        }
+
+        .candle.out .flame {
+            display: none;
+        }
+
+        .flame {
+            position: absolute;
+            background-color: orange;
+            width: 15px;
+            height: 35px;
+            border-radius: 8px 8px 8px 8px/20px 20px 8px 8px;
+            top: -40px;
+            left: 50%;
+            margin-left: -7.5px;
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(255, 165, 0, 0.5), 0 0 20px rgba(255, 165, 0, 0.5), 0 0 60px rgba(255, 165, 0, 0.5), 0 0 80px rgba(255, 165, 0, 0.5);
+            transform-origin: 50% 90%;
+            animation: flicker 1s ease-in-out alternate infinite;
+        }
+
+        @keyframes flicker {
+            0% {
+                transform: skewX(5deg);
+                box-shadow: 0 0 10px rgba(255, 165, 0, 0.2), 0 0 20px rgba(255, 165, 0, 0.2), 0 0 60px rgba(255, 165, 0, 0.2), 0 0 80px rgba(255, 165, 0, 0.2);
+            }
+            25% {
+                transform: skewX(-5deg);
+                box-shadow: 0 0 10px rgba(255, 165, 0, 0.5), 0 0 20px rgba(255, 165, 0, 0.5), 0 0 60px rgba(255, 165, 0, 0.5), 0 0 80px rgba(255, 165, 0, 0.5);
+            }
+            50% {
+                transform: skewX(10deg);
+                box-shadow: 0 0 10px rgba(255, 165, 0, 0.3), 0 0 20px rgba(255, 165, 0, 0.3), 0 0 60px rgba(255, 165, 0, 0.3), 0 0 80px rgba(255, 165, 0, 0.3);
+            }
+            75% {
+                transform: skewX(-10deg);
+                box-shadow: 0 0 10px rgba(255, 165, 0, 0.4), 0 0 20px rgba(255, 165, 0, 0.4), 0 0 60px rgba(255, 165, 0, 0.4), 0 0 80px rgba(255, 165, 0, 0.4);
+            }
+            100% {
+                transform: skewX(5deg);
+                box-shadow: 0 0 10px rgba(255, 165, 0, 0.5), 0 0 20px rgba(255, 165, 0, 0.5), 0 0 60px rgba(255, 165, 0, 0.5), 0 0 80px rgba(255, 165, 0, 0.5);
+            }
+        }
+
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #bbdefb; /* Very light blue */
+            color: #1565c0; /* Darker blue */
+            text-align: center;
+            padding: 10px 0;
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .heart {
+            animation: blink 1s linear infinite;
+            width: 16px;
+            height: 16px;
+            margin-left: 5px;
+        }
+
+        @keyframes blink {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Animations for celebration */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .celebration-text {
+            position: absolute;
+            font-size: 24px;
+            color: #1565c0; /* Darker blue */
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="cake">
+            <div class="plate"></div>
+            <div class="layer layer-bottom"></div>
+            <div class="layer layer-middle"></div>
+            <div class="layer layer-top"></div>
+            <div class="icing"></div>
+            <div class="drip drip1"></div>
+            <div class="drip drip2"></div>
+            <div class="drip drip3"></div>
+            <div class="candle" id="candle">
+                <div class="flame" id="flame"></div>
+            </div>
+        </div>
+
+        <div class="birthday-message" id="birthday-message">
+            Happy Birthday!
+        </div>
+
+        <div class="controls">
+            <button id="start-button">Bật mic</button>
+            <button id="reset-button" disabled>Thổi lại phát nữa</button>
+            <div id="mic-status">Microphone: Not active</div>
+        </div>
+
+        <p class="instructions">
+            Click "Bật mic" xong rồi ước xong rồi thổi nến!
+        </p>
+    </div>
+
+    <div class="footer">
+        For ĐìngHuy 19 tủi  <svg class="heart" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16,28.261c0,0-14-7.926-14-17.046c0-9.356,13.159-10.399,14-0.454c1.011-9.938,14-8.903,14,0.454
+            C30,20.335,16,28.261,16,28.261z" fill="#1565c0"/>
+        </svg>
+    </div>
+
+    <audio id="birthday-song" src="happy-birthday-254480.mp3" preload="auto"></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const flame = document.getElementById('flame');
+            const candle = document.getElementById('candle');
+            const birthdayMessage = document.getElementById('birthday-message');
+            const startButton = document.getElementById('start-button');
+            const resetButton = document.getElementById('reset-button');
+            const micStatus = document.getElementById('mic-status');
+            const birthdaySong = document.getElementById('birthday-song');
+
+            let audioContext;
+            let analyser;
+            let microphone;
+            let isListening = false;
+            let canBlowCandle = true;
+
+            // Initialize audio context on user interaction
+            startButton.addEventListener('click', startListening);
+            resetButton.addEventListener('click', resetCake);
+
+            function startListening() {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    analyser = audioContext.createAnalyser();
+                    analyser.minDecibels = -70;
+                    analyser.maxDecibels = -10;
+                    analyser.smoothingTimeConstant = 0.85;
+                }
+
+                if (!isListening) {
+                    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+                        .then(function(stream) {
+                            microphone = audioContext.createMediaStreamSource(stream);
+                            microphone.connect(analyser);
+
+                            isListening = true;
+                            canBlowCandle = true;
+                            startButton.disabled = true;
+                            resetButton.disabled = false;
+                            micStatus.textContent = "Microphone: Active - Thổi đê, mạnh vào!";
+                            micStatus.style.color = "#4CAF50";
+                            micStatus.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+
+                            detectBlowing();
+                        })
+                        .catch(function(err) {
+                            console.error('Error accessing microphone:', err);
+                            micStatus.textContent = "Error: Could not access microphone";
+                            micStatus.style.color = "#f44336";
+                        });
+                }
+            }
+
+            function detectBlowing() {
+                if (!isListening || !canBlowCandle) return;
+
+                analyser.fftSize = 256;
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+
+                function checkAudioLevel() {
+                    if (!isListening || !canBlowCandle) return;
+
+                    analyser.getByteFrequencyData(dataArray);
+
+                    // Calculate average volume
+                    let sum = 0;
+                    for (let i = 0; i < bufferLength; i++) {
+                        sum += dataArray[i];
+                    }
+                    const average = sum / bufferLength;
+
+                    // If sound is loud enough (blowing)
+                    if (average > 35) {  // Threshold may need adjustment based on testing
+                        blowOutCandle();
+                        return;
+                    }
+
+                    requestAnimationFrame(checkAudioLevel);
+                }
+
+                checkAudioLevel();
+            }
+
+            function blowOutCandle() {
+                if (!canBlowCandle) return;
+
+                canBlowCandle = false;
+
+                // Add out class to candle to hide flame
+                candle.classList.add('out');
+
+                // Show birthday message with animation
+                setTimeout(() => {
+                    birthdayMessage.style.opacity = '1';
+                    birthdayMessage.style.animation = 'float 3s ease-in-out infinite';
+
+                    // Play birthday song
+                    birthdaySong.play();
+
+                    // Create confetti effect
+                    createConfetti();
+
+                    // Show celebration texts
+                    showCelebrationTexts();
+
+                    micStatus.textContent = "Candle blown out! Happy Birthday!";
+                    micStatus.style.color = "#1565c0";
+                }, 300);
+            }
+
+            function resetCake() {
+                // Reset flame by removing out class
+                candle.classList.remove('out');
+
+                // Hide birthday message and remove animation
+                birthdayMessage.style.opacity = '0';
+                birthdayMessage.style.animation = 'none';
+
+                // Stop song if playing
+                birthdaySong.pause();
+                birthdaySong.currentTime = 0;
+
+                // Remove existing confetti
+                document.querySelectorAll('.confetti').forEach(el => el.remove());
+
+                // Remove celebration texts
+                document.querySelectorAll('.celebration-text').forEach(el => el.remove());
+
+                // Reset buttons and status
+                if (isListening) {
+                    canBlowCandle = true;
+                    micStatus.textContent = "Microphone: Active - Blow now!";
+                    micStatus.style.color = "#4CAF50";
+                    detectBlowing();
+                }
+            }
+
+            function createConfetti() {
+                const colors = ['#bbdefb', '#90caf9', '#64b5f6', '#42a5f5', '#2196f3', '#1e88e5', '#1976d2', '#1565c0', '#0d47a1']; // Blue shades
+
+                for (let i = 0; i < 100; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = `${Math.random() * 100}%`;
+                    confetti.style.width = `${Math.random() * 10 + 5}px`;
+                    confetti.style.height = `${Math.random() * 10 + 5}px`;
+                    confetti.style.opacity = '1';
+                    confetti.style.position = 'fixed';
+                    confetti.style.top = '-20px';
+                    confetti.style.zIndex = '1000';
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+
+                    // Set animation
+                    const duration = Math.random() * 3 + 2;
+                    const delay = Math.random() * 5;
+                    confetti.style.animation = `confetti-fall ${duration}s ease-in ${delay}s forwards`;
+
+                    document.body.appendChild(confetti);
+
+                    // Remove confetti after animation completes
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, (duration + delay) * 1000);
+                }
+            }
+
+            function showCelebrationTexts() {
+                const celebrationPhrases = [
+                    "Sinh nhật gì chưa zai đẹp?",
+                    "Mau ăn chóng lớn!",
+                    "Đìng weeeee!",
+                    "A+ A+ A+",
+                    "Ước đê",
+                    "Bùm bùm bùm bùm",
+                    "Yay!"
+                ];
+
+                for (let i = 0; i < 7; i++) {
+                    setTimeout(() => {
+                        const text = document.createElement('div');
+                        text.className = 'celebration-text';
+                        text.textContent = celebrationPhrases[i % celebrationPhrases.length];
+                        text.style.left = `${Math.random() * 80 + 10}%`;
+                        text.style.top = `${Math.random() * 80 + 10}%`;
+                        text.style.transform = `rotate(${Math.random() * 40 - 20}deg)`;
+                        document.body.appendChild(text);
+
+                        // Fade in
+                        setTimeout(() => {
+                            text.style.opacity = '1';
+                        }, 50);
+
+                        // Fade out and remove after a few seconds
+                        setTimeout(() => {
+                            text.style.opacity = '0';
+                            setTimeout(() => {
+                                text.remove();
+                            }, 500);
+                        }, 2000);
+                    }, i * 500);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
